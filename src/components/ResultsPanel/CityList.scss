@@ -1,0 +1,13 @@
+@import '../../styles/colors.scss';
+
+.CityList {
+  display: flex;
+  flex-direction: column;
+  max-height: 250px;
+  overflow-y: auto;
+  border-left: 1px solid $cl-silver;
+  border-right: 1px solid $cl-silver;
+  border-bottom: 1px solid $cl-silver;
+  position: absolute;
+  width: 100%;
+}

@@ -1,23 +1,23 @@
-import { useDispatch, useSelector } from 'react-redux';
-import React, { SyntheticEvent, useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import React, { SyntheticEvent, useState, useMemo } from 'react';
 import './CityPicker.scss';
 import { getCities, getFilteredCities } from '../../actions/cities';
-import { RootState } from '../../types/RootState';
+
 import debounce from 'lodash.debounce';
+import CityList from '../ResultsPanel/CityList';
 
 const CityPicker =  () => {
-  const cities = useSelector((state:RootState) => state.citiesState.cities);
   const [searchText, updateSearchText] = useState('');
   const dispatch = useDispatch();
 
   const handleTextChange = (e: SyntheticEvent<HTMLInputElement>) => {
     updateSearchText(e.currentTarget.value);
-    debouncedTextUpdate(searchText);
+    debouncedTextUpdate(e.currentTarget.value);
   }
 
-  const debouncedTextUpdate = useCallback(
-		debounce((searchText:string) => dispatch(getFilteredCities(searchText)), 1000),
-		[], // will be created only once initially
+  const debouncedTextUpdate = useMemo(
+		() => debounce((searchText:string) => dispatch(getFilteredCities(searchText)), 1000),
+		[dispatch],
 	);
 
   function handleFocus(e: SyntheticEvent<HTMLInputElement>) {
@@ -36,7 +36,7 @@ const CityPicker =  () => {
         value={searchText}
         placeholder="Type to filter by city name or country"
       />
-      {cities.map(city => (<p>{city.name}</p>))}
+      <CityList></CityList>
     </div>
   );
 }

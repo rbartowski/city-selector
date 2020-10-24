@@ -1,7 +1,13 @@
+@import '../../styles/colors.scss';
+
 .CityPicker {
-  input {
+  position: relative;
+
+  #city-picker {
     width: 400px;
     height: 30px;
     padding-left: 40px;
+    border-radius: 0;
+    border: 1px solid $cl-silver;
   }
 }

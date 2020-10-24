@@ -1,0 +1,34 @@
+@import '../../styles/fonts.scss';
+@import '../../styles/colors.scss';
+
+.CityItem {
+  display: flex;
+  padding: 7px 16px 8px 40px;
+  text-align: left;
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid $cl-alto;
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    &-name {
+      margin-top: 0;
+      margin-bottom: 5px;
+      font-size: $size-14;
+    }
+
+    &-country {
+      font-size: $size-10;
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+  }
+}
