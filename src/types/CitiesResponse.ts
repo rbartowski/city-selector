@@ -1,7 +1,7 @@
-import CityInfo from './CityInfo';
+import City from './City';
 
 type CitiesResponse = {
-  data: CityInfo[];
+  data: City[];
   total: number;
   links: {
     first: string;

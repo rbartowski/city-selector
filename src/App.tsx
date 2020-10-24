@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.scss';
-import CitySelector from './components/CitySelector/CitySelector';
+import CityPicker from './components/CityPicker/CityPicker';
 
 function App() {
   return (
     <div className="App">
-      <CitySelector></CitySelector>
+      <CityPicker></CityPicker>
     </div>
   );
 }

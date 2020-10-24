@@ -1,8 +1,8 @@
-type CityInfo = {
+type City = {
   geonameid: number;
   name: string;
   country: string;
   subcountry?: string;
 };
 
-export default CityInfo;
+export default City;
