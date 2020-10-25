@@ -1,13 +1,16 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import React, { SyntheticEvent, useState, useMemo } from 'react';
-import './CityPicker.scss';
+import { RootState } from '../../types/RootState';
 import { getCities, getFilteredCities } from '../../actions/cities';
+import './CityPicker.scss';
 
 import debounce from 'lodash.debounce';
 import CityList from '../ResultsPanel/CityList';
 
 const CityPicker =  () => {
   const [searchText, updateSearchText] = useState('');
+  const isLoading = useSelector((state:RootState) => state.citiesState.isLoading);
+  const cities = useSelector((state:RootState) => state.citiesState.cities);
   const dispatch = useDispatch();
 
   const handleTextChange = (e: SyntheticEvent<HTMLInputElement>) => {
@@ -36,7 +39,8 @@ const CityPicker =  () => {
         value={searchText}
         placeholder="Type to filter by city name or country"
       />
-      <CityList></CityList>
+      {isLoading && (<img src="/loading.gif" alt="loading"/>)}
+      {cities.length > 0 && <CityList></CityList>}
     </div>
   );
 }

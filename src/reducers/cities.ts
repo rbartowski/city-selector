@@ -1,4 +1,9 @@
-import { GET_CITIES_START, GET_CITIES_SUCCESS, GET_CITIES_ERROR, UPDATE_SEARCH_TEXT } from "../actions/cities";
+import {
+  GET_CITIES_START,
+  GET_CITIES_SUCCESS,
+  GET_CITIES_ERROR,
+  UPDATE_SEARCH_TEXT
+} from "../actions/cities";
 import { CitiesState } from "../types/CitiesState";
 import { createReducer } from '../types/Reducer';
 
@@ -21,12 +26,23 @@ export default createReducer<CitiesState>(defaultState, {
     isLoading: true,
     error: null
   }),
-  [GET_CITIES_SUCCESS]: (state, action) => ({
-    ...state,
-    isLoading: false,
-    error: null,
-    cities: [...action.response.data],
-  }),
+  [GET_CITIES_SUCCESS]: (state, action) => {
+    const { response: { data, links }, isAppend } = action;
+    return {
+      ...state,
+      isLoading: false,
+      error: null,
+      cities: isAppend ? [...state.cities, ...data] : [...data],
+      pagination: {
+        ...state.pagination,
+        first: links.first,
+        last: links.last,
+        total: links.total,
+        next: links.next,
+        prev: links.prev
+      }
+    }
+  },
   [GET_CITIES_ERROR]: (state, action) => ({
     ...state,
     isLoading: false,

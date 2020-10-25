@@ -5,6 +5,7 @@ import { RootState } from "../types/RootState";
 
 export const GET_CITIES_START = 'GET_CITIES_START';
 export const GET_CITIES_SUCCESS = 'GET_CITIES_SUCCESS';
+export const GET_MORE_CITIES_SUCCESS = 'GET_MORE_CITIES_SUCCESS';
 export const GET_CITIES_ERROR = 'GET_CITIES_ERROR';
 export const UPDATE_SEARCH_TEXT = 'UPDATE_SEARCH_TEXT';
 export const CLEAN_CITIES = 'CLEAN_CITIES';
@@ -15,9 +16,10 @@ const getCitiesStart = () => ({
   type: GET_CITIES_START
 });
 
-const getCitiesSuccess = (response: CitiesResponse) => ({
+const getCitiesSuccess = (response: CitiesResponse, isAppend: boolean = false) => ({
   type: GET_CITIES_SUCCESS,
-  response
+  response,
+  isAppend
 });
 
 const getCitiesError = (error: Error) => ({
@@ -43,11 +45,13 @@ export const getFilteredCities = (searchText: string) => {
   };
 };
 
-export const getCities = () => {
+export const getCities = (isGetMore: boolean = false) => {
 
   return async (dispatch: Dispatch, getState: () => RootState) => {
     const { citiesState: { pagination }} = getState();
-    let apiUrl = API_URL + `?offset=0&limit=${pagination.pageSize}&filter=${pagination.searchText}`;
+    let apiUrl = isGetMore ?
+      pagination.next || API_URL :
+      API_URL + `?offset=0&limit=${pagination.pageSize}&filter=${pagination.searchText}`;
 
     dispatch(getCitiesStart());
 
@@ -55,7 +59,7 @@ export const getCities = () => {
       const result = await fetch(apiUrl);
       const jsonRes = await result.json();
 
-      dispatch(getCitiesSuccess(jsonRes));
+      dispatch(getCitiesSuccess(jsonRes, isGetMore));
     } catch (error) {
       dispatch(getCitiesError(error));
     }

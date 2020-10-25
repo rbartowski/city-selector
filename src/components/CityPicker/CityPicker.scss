@@ -10,4 +10,12 @@
     border-radius: 0;
     border: 1px solid $cl-silver;
   }
+
+  img {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+  }
 }
