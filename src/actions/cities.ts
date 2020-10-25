@@ -16,10 +16,10 @@ const getCitiesStart = () => ({
   type: GET_CITIES_START
 });
 
-const getCitiesSuccess = (response: CitiesResponse, isAppend: boolean = false) => ({
+const getCitiesSuccess = (response: CitiesResponse, isGetMore: boolean = false) => ({
   type: GET_CITIES_SUCCESS,
   response,
-  isAppend
+  isGetMore
 });
 
 const getCitiesError = (error: Error) => ({

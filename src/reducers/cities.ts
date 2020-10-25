@@ -9,11 +9,13 @@ import { createReducer } from '../types/Reducer';
 
 const defaultState: CitiesState = {
   isLoading: false,
+  isScrolling: false,
   error: null,
   cities: [],
   pagination: {
     total: 0,
     pageSize: 10,
+    currentPage: 0,
     first: '',
     last: '',
     searchText: ''
@@ -27,19 +29,21 @@ export default createReducer<CitiesState>(defaultState, {
     error: null
   }),
   [GET_CITIES_SUCCESS]: (state, action) => {
-    const { response: { data, links }, isAppend } = action;
+    const { response: { data, links }, isGetMore } = action;
     return {
       ...state,
       isLoading: false,
       error: null,
-      cities: isAppend ? [...state.cities, ...data] : [...data],
+      isScrolling: isGetMore,
+      cities: isGetMore ? [...state.cities, ...data] : [...data],
       pagination: {
         ...state.pagination,
         first: links.first,
         last: links.last,
         total: links.total,
         next: links.next,
-        prev: links.prev
+        prev: links.prev,
+        currentPage: isGetMore ? state.pagination.currentPage + 1 : 0
       }
     }
   },
