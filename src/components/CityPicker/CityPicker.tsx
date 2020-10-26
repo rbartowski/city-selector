@@ -1,32 +1,35 @@
 import { useDispatch, useSelector } from 'react-redux';
-import React, { SyntheticEvent, useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { SyntheticEvent, useState, useEffect, useCallback, useRef } from 'react';
 import { RootState } from '../../types/RootState';
 import { getCities, getFilteredCities } from '../../actions/cities';
 import './CityPicker.scss';
-import debounce from 'lodash.debounce';
 import CityList from '../CityList/CityList';
+import useDebounce from '../../hooks/useDebounce';
+import useOnClickOutside from '../../hooks/useOnClickOutside';
 
 const CityPicker =  () => {
   const cityPicker = useRef<HTMLDivElement>(null);
-  const [searchText, updateSearchText] = useState('');
+  const [searchText, updateSearchText] = useState<string | undefined>(undefined);
   const [showResultsPanel, toggleResultsPanel] = useState(false);
+  const debouncedText = useDebounce(searchText, 500);
   const isLoading = useSelector((state:RootState) => state.citiesState.isLoading);
   const cities = useSelector((state:RootState) => state.citiesState.cities);
   const dispatch = useDispatch();
 
-  const clickOutside = useCallback((e: MouseEvent) => {
-    if (cityPicker && cityPicker.current && !cityPicker.current.contains(e.target as Element)) {
-      toggleResultsPanel(false);
-    }
-  }, [cityPicker]);
+  const clickOutside = useCallback(() => {
+    toggleResultsPanel(false);
+}, []);
+
+  useOnClickOutside(cityPicker, clickOutside);
 
   useEffect(() => {
-    document.addEventListener('click', clickOutside);
-  }, [clickOutside]);
+    if (debouncedText !== undefined) {
+      dispatch(getFilteredCities(debouncedText));
+    }
+  }, [debouncedText, dispatch]);
 
   const handleTextChange = (e: SyntheticEvent<HTMLInputElement>) => {
     updateSearchText(e.currentTarget.value);
-    debouncedTextUpdate(e.currentTarget.value);
   };
 
   const handleFocus = () => {
@@ -35,15 +38,6 @@ const CityPicker =  () => {
       dispatch(getCities());
     }
   }
-
-  const filterCities = useCallback((searchText:string) => {
-    dispatch(getFilteredCities(searchText));
-  }, [dispatch]);
-
-  const debouncedTextUpdate = useMemo(
-    () => debounce(filterCities, 500),
-    [filterCities]
-  );
 
   return (
     <div ref={cityPicker} className="CityPicker">
