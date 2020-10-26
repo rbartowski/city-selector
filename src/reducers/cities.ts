@@ -2,7 +2,10 @@ import {
   GET_CITIES_START,
   GET_CITIES_SUCCESS,
   GET_CITIES_ERROR,
-  UPDATE_SEARCH_TEXT
+  UPDATE_SEARCH_TEXT,
+  UPDATE_PREFERRED_CITIES_START,
+  UPDATE_PREFERRED_CITIES_SUCCESS,
+  UPDATE_PREFERRED_CITIES_ERROR
 } from "../actions/cities";
 import { CitiesState } from "../types/CitiesState";
 import { createReducer } from '../types/Reducer';
@@ -12,6 +15,7 @@ const defaultState: CitiesState = {
   isScrolling: false,
   error: null,
   cities: [],
+  preferredCities: [],
   pagination: {
     total: 0,
     pageSize: 10,
@@ -58,5 +62,29 @@ export default createReducer<CitiesState>(defaultState, {
       ...state.pagination,
       searchText: action.searchText
     }
+  }),
+  [UPDATE_PREFERRED_CITIES_START]: state => ({
+    ...state,
+    isLoading: true
+  }),
+  [UPDATE_PREFERRED_CITIES_SUCCESS]: (state, action) => {
+    const newPreferred: number[] = Object.keys(action.preferredCities)
+                                          .filter(id => action.preferredCities[id])
+                                          .map(id => parseInt(id));
+
+    const toRemove: number[] = Object.keys(action.preferredCities)
+                                      .filter(id => !action.preferredCities[id])
+                                      .map(id => parseInt(id));
+
+    return {
+      ...state,
+      isLoading: false,
+      preferredCities: [...state.preferredCities.filter(id => !toRemove.includes(id)), ...newPreferred]
+    };
+  },
+  [UPDATE_PREFERRED_CITIES_ERROR]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    error: action.error
   })
 });

@@ -5,6 +5,7 @@ export interface CitiesState {
   isScrolling: boolean,
   error: Error | null,
   cities: City[],
+  preferredCities: number[],
   pagination: {
     total: number,
     next?: string,

@@ -1,34 +1,35 @@
 import { useDispatch, useSelector } from 'react-redux';
-import React, { SyntheticEvent, useState, useMemo, useEffect, useCallback } from 'react';
+import React, { SyntheticEvent, useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { RootState } from '../../types/RootState';
 import { getCities, getFilteredCities } from '../../actions/cities';
 import './CityPicker.scss';
-
 import debounce from 'lodash.debounce';
-import CityList from '../ResultsPanel/CityList';
+import CityList from '../CityList/CityList';
 
 const CityPicker =  () => {
-  const cityPicker = React.createRef<HTMLDivElement>();
+  const cityPicker = useRef<HTMLDivElement>(null);
   const [searchText, updateSearchText] = useState('');
   const [showResultsPanel, toggleResultsPanel] = useState(false);
   const isLoading = useSelector((state:RootState) => state.citiesState.isLoading);
   const cities = useSelector((state:RootState) => state.citiesState.cities);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    document.addEventListener('click', (e:MouseEvent) => {
-      if (cityPicker && cityPicker.current && !cityPicker.current.contains(e.target as Element)) {
-        toggleResultsPanel(false);
-      }
-    });
+  const clickOutside = useCallback((e: MouseEvent) => {
+    if (cityPicker && cityPicker.current && !cityPicker.current.contains(e.target as Element)) {
+      toggleResultsPanel(false);
+    }
   }, [cityPicker]);
+
+  useEffect(() => {
+    document.addEventListener('click', clickOutside);
+  }, [clickOutside]);
 
   const handleTextChange = (e: SyntheticEvent<HTMLInputElement>) => {
     updateSearchText(e.currentTarget.value);
     debouncedTextUpdate(e.currentTarget.value);
   };
 
-  const handleFocus = (e: SyntheticEvent<HTMLInputElement>) => {
+  const handleFocus = () => {
     toggleResultsPanel(true);
     if (!searchText && !cities.length) {
       dispatch(getCities());
