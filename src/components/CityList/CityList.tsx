@@ -31,7 +31,7 @@ const CityList =  (props: CityListProps) => {
     setScrollAmount(newPos);
 
     if (newPos > scrollPageAmount) {
-      dispatch(getCities(true));
+      dispatch(getCities(true, true));
     }
   }, [dispatch]);
 

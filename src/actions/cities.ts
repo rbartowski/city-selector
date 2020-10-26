@@ -1,9 +1,10 @@
 
 import CitiesResponse from "../types/CitiesResponse";
-import { Dispatch } from 'redux';
+import { Action, Dispatch } from 'redux';
 import { RootState } from "../types/RootState";
 import PreferredCitiesPatch from "../types/PreferredCitiesPatch";
 import PreferredCities from "../types/PreferredCities";
+import { ThunkDispatch } from "redux-thunk";
 
 export const GET_CITIES_START = 'GET_CITIES_START';
 export const GET_CITIES_SUCCESS = 'GET_CITIES_SUCCESS';
@@ -74,47 +75,48 @@ export const updateSearchText = (searchText: string) => ({
 export const getFilteredCities = (searchText: string) => {
   return (dispatch: Dispatch<any>) => {
     dispatch(updateSearchText(searchText));
-    dispatch(getCities());
+    dispatch(getCities(true));
   };
 };
 
-export const getCities = (isGetMore: boolean = false) => {
-  return async (dispatch: Dispatch, getState: () => RootState) => {
+export const getCities = (showLoader: boolean = false, isGetMore: boolean = false) => {
+  return async (dispatch: ThunkDispatch<RootState, void, Action>, getState: () => RootState) => {
     const { citiesState: { pagination }} = getState();
     const apiUrl = isGetMore ?
       pagination.next || API_URL :
       API_URL + `?offset=0&limit=${pagination.pageSize}&filter=${pagination.searchText}`;
 
-    dispatch(getCitiesStart());
+      dispatch(getCitiesStart());
 
     try {
       const result = await fetch(apiUrl);
       const jsonRes = await result.json();
 
-      dispatch(getCitiesSuccess(jsonRes, isGetMore));
+      return dispatch(getCitiesSuccess(jsonRes, isGetMore));
     } catch (error) {
-      dispatch(getCitiesError(error));
+      return dispatch(getCitiesError(error));
     }
   }
 };
 
-export const getPreferredCities = () => {
-  return async (dispatch: Dispatch) => {
+export const getPreferredCities = (showLoader: boolean = false) => {
+  return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
+
     dispatch(getPreferredCitiesStart());
 
     try {
       const result = await fetch(PREFERRED_API_URL);
       const jsonRes = await result.json();
 
-      dispatch(getPreferredCitiesSuccess(jsonRes));
+      return dispatch(getPreferredCitiesSuccess(jsonRes));
     } catch(error) {
-      dispatch(getPreferredCitiesError(error));
+      return dispatch(getPreferredCitiesError(error));
     }
   };
 };
 
 export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => {
-  return async (dispatch: Dispatch) => {
+  return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
     dispatch(updatePreferredCitiesStart());
 
     try {
@@ -127,9 +129,17 @@ export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => 
         body: JSON.stringify(preferredCities)
       });
 
-      dispatch(updatePreferredCitiesSuccess(preferredCities));
+      return dispatch(updatePreferredCitiesSuccess(preferredCities));
     } catch (error) {
-      dispatch(updatePreferredCitiesError(error));
+      return dispatch(updatePreferredCitiesError(error));
     }
   };
 };
+
+export const getInitialData = () => {
+  return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
+    await dispatch(getPreferredCities());
+    await dispatch(getCities());
+  }
+};
+
