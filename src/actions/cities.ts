@@ -3,10 +3,14 @@ import CitiesResponse from "../types/CitiesResponse";
 import { Dispatch } from 'redux';
 import { RootState } from "../types/RootState";
 import PreferredCitiesPatch from "../types/PreferredCitiesPatch";
+import PreferredCities from "../types/PreferredCities";
 
 export const GET_CITIES_START = 'GET_CITIES_START';
 export const GET_CITIES_SUCCESS = 'GET_CITIES_SUCCESS';
 export const GET_CITIES_ERROR = 'GET_CITIES_ERROR';
+export const GET_PREFERRED_CITIES_START = 'GET_PREFERRED_CITIES_START';
+export const GET_PREFERRED_CITIES_SUCCESS = 'GET_PREFERRED_CITIES_SUCCESS';
+export const GET_PREFERRED_CITIES_ERROR = 'GET_PREFERRED_CITIES_ERROR';
 export const UPDATE_PREFERRED_CITIES_START = 'UPDATE_PREFERRED_CITIES_START';
 export const UPDATE_PREFERRED_CITIES_SUCCESS = 'UPDATE_PREFERRED_CITIES_SUCCESS';
 export const UPDATE_PREFERRED_CITIES_ERROR = 'UPDATE_PREFERRED_CITIES_ERROR';
@@ -27,6 +31,22 @@ const getCitiesSuccess = (response: CitiesResponse, isGetMore: boolean = false) 
 
 const getCitiesError = (error: Error) => ({
   type: GET_CITIES_ERROR,
+  payload: {
+    error
+  }
+});
+
+const getPreferredCitiesStart = () => ({
+  type: GET_PREFERRED_CITIES_START
+});
+
+const getPreferredCitiesSuccess = (preferredCities: PreferredCities) => ({
+  type: GET_PREFERRED_CITIES_SUCCESS,
+  preferredCities
+});
+
+const getPreferredCitiesError = (error: Error) => ({
+  type: GET_PREFERRED_CITIES_ERROR,
   payload: {
     error
   }
@@ -78,7 +98,22 @@ export const getCities = (isGetMore: boolean = false) => {
   }
 };
 
-const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => {
+export const getPreferredCities = () => {
+  return async (dispatch: Dispatch) => {
+    dispatch(getPreferredCitiesStart());
+
+    try {
+      const result = await fetch(PREFERRED_API_URL);
+      const jsonRes = await result.json();
+
+      dispatch(getPreferredCitiesSuccess(jsonRes));
+    } catch(error) {
+      dispatch(getPreferredCitiesError(error));
+    }
+  };
+};
+
+export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => {
   return async (dispatch: Dispatch) => {
     dispatch(updatePreferredCitiesStart());
 
@@ -98,8 +133,3 @@ const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => {
     }
   };
 };
-
-export const updatePreferredCity = (isChecked: boolean, cityId: number) => {
-  const payload: PreferredCitiesPatch = {[cityId.toString()]: isChecked};
-  return updatePreferredCities(payload);
-}

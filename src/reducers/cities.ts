@@ -5,7 +5,10 @@ import {
   UPDATE_SEARCH_TEXT,
   UPDATE_PREFERRED_CITIES_START,
   UPDATE_PREFERRED_CITIES_SUCCESS,
-  UPDATE_PREFERRED_CITIES_ERROR
+  UPDATE_PREFERRED_CITIES_ERROR,
+  GET_PREFERRED_CITIES_START,
+  GET_PREFERRED_CITIES_SUCCESS,
+  GET_PREFERRED_CITIES_ERROR
 } from "../actions/cities";
 import { CitiesState } from "../types/CitiesState";
 import { createReducer } from '../types/Reducer';
@@ -56,6 +59,21 @@ export default createReducer<CitiesState>(defaultState, {
     isLoading: false,
     error: action.payload
   }),
+  [GET_PREFERRED_CITIES_START]: state => ({
+    ...state,
+    isLoading: true,
+    error: null
+  }),
+  [GET_PREFERRED_CITIES_SUCCESS]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    preferredCities: [...action.preferredCities.data]
+  }),
+  [GET_PREFERRED_CITIES_ERROR]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    error: action.error
+  }),
   [UPDATE_SEARCH_TEXT]: (state, action) => ({
     ...state,
     pagination: {
@@ -65,7 +83,8 @@ export default createReducer<CitiesState>(defaultState, {
   }),
   [UPDATE_PREFERRED_CITIES_START]: state => ({
     ...state,
-    isLoading: true
+    isLoading: true,
+    error: null
   }),
   [UPDATE_PREFERRED_CITIES_SUCCESS]: (state, action) => {
     const newPreferred: number[] = Object.keys(action.preferredCities)

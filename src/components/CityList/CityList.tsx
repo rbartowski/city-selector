@@ -20,8 +20,11 @@ const CityList =  (props: CityListProps) => {
   const throttledScrollAmount = useThrottle(scrollAmount, 500);
   const dispatch = useDispatch();
 
+  /* each scrolling page (10 items) is the list container client height * 2,
+      and the offset is the height of the first 4 items. This method will trigger a fetch whenever we're scrolling down
+      and  we're positioned 2 items before the page end */
   const calculateScrollParams = useCallback((newPos: number, currentPage: number, cityList: RefObject<HTMLDivElement>) => {
-    const scrollPageOffset = 200; // height of the first 4 items (50px * 4)
+    const scrollPageOffset = 150;
     const pageHeight = cityList && cityList.current ? cityList.current.clientHeight * 2 : 500;
     const scrollPageAmount = scrollPageOffset + currentPage * pageHeight;
 
@@ -51,7 +54,11 @@ const CityList =  (props: CityListProps) => {
   return (
     <div ref={cityList} onScroll={handleScroll} className="CityList">
       {props.cities.map(city => (
-        <CityListItem key={city.geonameid} city={city} isChecked={preferredCities.includes(city.geonameid)}></CityListItem>
+        <CityListItem
+          key={city.geonameid}
+          city={city}
+          isChecked={preferredCities.includes(city.geonameid)}
+        />
       ))}
     </div>
   );

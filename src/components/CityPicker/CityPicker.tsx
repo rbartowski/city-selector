@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React, { SyntheticEvent, useState, useEffect, useCallback, useRef } from 'react';
 import { RootState } from '../../types/RootState';
-import { getCities, getFilteredCities } from '../../actions/cities';
+import { getCities, getFilteredCities, getPreferredCities } from '../../actions/cities';
 import './CityPicker.scss';
 import CityList from '../CityList/CityList';
 import useDebounce from '../../hooks/useDebounce';
@@ -18,9 +18,13 @@ const CityPicker =  () => {
 
   const clickOutside = useCallback(() => {
     toggleResultsPanel(false);
-}, []);
+  }, []);
 
   useOnClickOutside(cityPicker, clickOutside);
+
+  useEffect(() => {
+    dispatch(getPreferredCities());
+  }, [dispatch]);
 
   useEffect(() => {
     if (debouncedText !== undefined) {
