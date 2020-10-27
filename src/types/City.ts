@@ -3,6 +3,7 @@ type City = {
   name: string;
   country: string;
   subcountry?: string;
+  selected?: boolean;
 };
 
 export default City;

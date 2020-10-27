@@ -5,6 +5,7 @@ import { RootState } from "../types/RootState";
 import PreferredCitiesPatch from "../types/PreferredCitiesPatch";
 import PreferredCities from "../types/PreferredCities";
 import { ThunkDispatch } from "redux-thunk";
+import City from "../types/City";
 
 export const GET_CITIES_START = 'GET_CITIES_START';
 export const GET_CITIES_SUCCESS = 'GET_CITIES_SUCCESS';
@@ -32,32 +33,29 @@ const getCitiesSuccess = (response: CitiesResponse, isGetMore: boolean = false) 
 
 const getCitiesError = (error: Error) => ({
   type: GET_CITIES_ERROR,
-  payload: {
-    error
-  }
+  error
 });
 
 const getPreferredCitiesStart = () => ({
   type: GET_PREFERRED_CITIES_START
 });
 
-const getPreferredCitiesSuccess = (preferredCities: PreferredCities) => ({
+const getPreferredCitiesSuccess = (preferredCities: City[]) => ({
   type: GET_PREFERRED_CITIES_SUCCESS,
   preferredCities
 });
 
 const getPreferredCitiesError = (error: Error) => ({
   type: GET_PREFERRED_CITIES_ERROR,
-  payload: {
-    error
-  }
+  error
+
 });
 
 const updatePreferredCitiesStart = () => ({
   type: UPDATE_PREFERRED_CITIES_START
 });
 
-const updatePreferredCitiesSuccess = (preferredCities: PreferredCitiesPatch) => ({
+const updatePreferredCitiesSuccess = (preferredCities: City[]) => ({
   type: UPDATE_PREFERRED_CITIES_SUCCESS,
   preferredCities
 });
@@ -75,11 +73,11 @@ export const updateSearchText = (searchText: string) => ({
 export const getFilteredCities = (searchText: string) => {
   return (dispatch: ThunkDispatch<RootState, void, Action>) => {
     dispatch(updateSearchText(searchText));
-    dispatch(getCities(true));
+    dispatch(getCities());
   };
 };
 
-export const getCities = (showLoader: boolean = false, isGetMore: boolean = false) => {
+export const getCities = (isGetMore: boolean = false) => {
   return async (dispatch: ThunkDispatch<RootState, void, Action>, getState: () => RootState) => {
     const { citiesState: { pagination }} = getState();
     const apiUrl = isGetMore ?
@@ -99,38 +97,77 @@ export const getCities = (showLoader: boolean = false, isGetMore: boolean = fals
   }
 };
 
-export const getPreferredCities = (showLoader: boolean = false) => {
+const getCityDetails = async(id: number) => {
+  try {
+    const cityRes = await fetch(`${API_URL}/${id}`);
+
+    if (cityRes.status !== 200) {
+      throw new Error('Bad response from server');
+    }
+
+    const cityJson = await cityRes.json();
+
+    return cityJson;
+  }
+  catch(error) {
+    throw error;
+  }
+}
+
+export const getPreferredCities = () => {
   return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
 
     dispatch(getPreferredCitiesStart());
 
     try {
+      const preferredCities: City[] = [];
       const result = await fetch(PREFERRED_API_URL);
-      const jsonRes = await result.json();
 
-      return dispatch(getPreferredCitiesSuccess(jsonRes));
+      if (result.status !== 200) {
+        throw new Error('Bad response from server');
+      }
+
+      const jsonRes: PreferredCities = await result.json();
+
+      if (!jsonRes.data.length) {
+        return dispatch(getPreferredCitiesSuccess([]));
+      }
+
+      await Promise.all(jsonRes.data.map(async(cityId: number) => {
+        try {
+          const city = await getCityDetails(cityId);
+          preferredCities.push(city);
+        } catch(error) {
+          throw error;
+        }
+      }));
+
+      return dispatch(getPreferredCitiesSuccess(preferredCities));
     } catch(error) {
       return dispatch(getPreferredCitiesError(error));
     }
   };
 };
 
-export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => {
+export const updatePreferredCities = (preferredCities: City[]) => {
   return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
     dispatch(updatePreferredCitiesStart());
 
     try {
+      const ids: PreferredCitiesPatch = Object.assign({},
+        ...preferredCities.map(({geonameid, selected}) => ({[geonameid]: selected})));
+
       const res = await fetch(PREFERRED_API_URL, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(preferredCities)
+        body: JSON.stringify(ids)
       });
 
       if (res.status !== 204) {
-        throw new Error();
+        throw new Error('Bad response from server');
       }
 
       return dispatch(updatePreferredCitiesSuccess(preferredCities));

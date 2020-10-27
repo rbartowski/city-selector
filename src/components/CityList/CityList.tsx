@@ -9,7 +9,7 @@ import { Pagination } from '../../types/Pagination';
 
 type CityListProps = {
   cities: City[],
-  preferredCities: number[],
+  preferredCities: City[],
   isLoading: boolean,
   pagination: Pagination,
   searchTerm: string | undefined
@@ -17,10 +17,20 @@ type CityListProps = {
 
 const CityList =  (props: CityListProps) => {
   const {pagination, isLoading, cities, preferredCities, searchTerm} = props;
+
+  const [preferredCitiesIds, setPreferredIds] = useState(preferredCities.map(city => city.geonameid));
+  useEffect(() => {
+    setPreferredIds(preferredCities.map(city => city.geonameid));
+  }, [preferredCities]);
+
   const cityList = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
   const [scrollAmount, setScrollAmount] = useState(0);
   const throttledScrollAmount = useThrottle(scrollAmount, 500);
-  const dispatch = useDispatch();
+
+  const handleScroll = (e: SyntheticEvent<HTMLDivElement>) => {
+    setScrollAmount(e.currentTarget.scrollTop);
+  };
 
   /* each scrolling page (10 items) is the list container client height * 2,
       and the offset is the height of the first 4 items. This method will trigger a fetch whenever we're scrolling down
@@ -33,7 +43,7 @@ const CityList =  (props: CityListProps) => {
     setScrollAmount(newPos);
 
     if (newPos > scrollPageAmount) {
-      dispatch(getCities(true, true));
+      dispatch(getCities(true));
     }
   }, [dispatch]);
 
@@ -49,17 +59,13 @@ const CityList =  (props: CityListProps) => {
     }
   }, [throttledScrollAmount, scrollAmount, isLoading, pagination, calculateScrollParams]);
 
-  const handleScroll = (e: SyntheticEvent<HTMLDivElement>) => {
-    setScrollAmount(e.currentTarget.scrollTop);
-  };
-
   return (
     <div ref={cityList} onScroll={handleScroll} className="CityList">
       {cities.map(city => (
         <CityListItem
           key={city.geonameid}
           city={city}
-          isChecked={preferredCities.includes(city.geonameid)}
+          isChecked={preferredCitiesIds.includes(city.geonameid)}
           searchTerm={searchTerm}
         />
       ))}

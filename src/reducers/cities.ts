@@ -11,12 +11,15 @@ import {
   GET_PREFERRED_CITIES_ERROR
 } from "../actions/cities";
 import { CitiesState } from "../types/CitiesState";
+import City from "../types/City";
 import { createReducer } from '../types/Reducer';
 
 const defaultState: CitiesState = {
   isLoading: false,
   isLoadingSelected: false,
-  error: null,
+  citiesError: null,
+  preferredError: null,
+  updateError: null,
   cities: [],
   preferredCities: [],
   pagination: {
@@ -33,14 +36,14 @@ export default createReducer<CitiesState>(defaultState, {
   [GET_CITIES_START]: state => ({
     ...state,
     isLoading: true,
-    error: null
+    citiesError: null
   }),
   [GET_CITIES_SUCCESS]: (state, action) => {
     const { response: { data, links }, isGetMore } = action;
     return {
       ...state,
       isLoading: false,
-      error: null,
+      citiesError: null,
       isScrolling: isGetMore,
       cities: isGetMore ? [...state.cities, ...data] : [...data],
       pagination: {
@@ -57,22 +60,22 @@ export default createReducer<CitiesState>(defaultState, {
   [GET_CITIES_ERROR]: (state, action) => ({
     ...state,
     isLoading: false,
-    error: action.payload
+    citiesError: action.error.message
   }),
   [GET_PREFERRED_CITIES_START]: state => ({
     ...state,
     isLoadingSelected: true,
-    selectedError: null
+    preferredError: null
   }),
   [GET_PREFERRED_CITIES_SUCCESS]: (state, action) => ({
     ...state,
     isLoadingSelected: false,
-    preferredCities: [...action.preferredCities.data]
+    preferredCities: [...action.preferredCities]
   }),
   [GET_PREFERRED_CITIES_ERROR]: (state, action) => ({
     ...state,
     isLoadingSelected: false,
-    selectedError: action.error
+    preferredError: action.error.message
   }),
   [UPDATE_SEARCH_TEXT]: (state, action) => ({
     ...state,
@@ -84,27 +87,25 @@ export default createReducer<CitiesState>(defaultState, {
   [UPDATE_PREFERRED_CITIES_START]: state => ({
     ...state,
     isLoading: true,
-    error: null
+    updateError: null
   }),
   [UPDATE_PREFERRED_CITIES_SUCCESS]: (state, action) => {
-    const newPreferred: number[] = Object.keys(action.preferredCities)
-                                          .filter(id => action.preferredCities[id])
-                                          .map(id => parseInt(id));
-
-    const toRemove: number[] = Object.keys(action.preferredCities)
-                                      .filter(id => !action.preferredCities[id])
-                                      .map(id => parseInt(id));
+    const newPreferred: City[] = action.preferredCities.filter((city: City) => city.selected);
+    const toRemove: number[] = action.preferredCities.filter((city: City) => !city.selected)
+                                                     .map((city: City) => city.geonameid);
 
     return {
       ...state,
       isLoading: false,
-      preferredCities: [...state.preferredCities.filter(id => !toRemove.includes(id)), ...newPreferred]
+      preferredCities: [
+        ...state.preferredCities.filter(city => !toRemove.includes(city.geonameid)),
+        ...newPreferred]
     };
   },
   [UPDATE_PREFERRED_CITIES_ERROR]: (state, action) => ({
     ...state,
     isLoading: false,
-    error: action.error,
+    updateError: action.error.message,
     preferredCities: [...state.preferredCities]
   })
 });
