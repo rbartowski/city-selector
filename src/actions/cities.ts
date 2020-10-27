@@ -6,6 +6,7 @@ import PreferredCitiesPatch from "../types/PreferredCitiesPatch";
 import PreferredCities from "../types/PreferredCities";
 import { ThunkDispatch } from "redux-thunk";
 import City from "../types/City";
+import {PATCH_SUCCESS_CODE, GET_SUCCESS_CODE, API_RETRY_ATTEMPTS, fetch_retry} from "../helpers/fetch-retry";
 
 export const GET_CITIES_START = 'GET_CITIES_START';
 export const GET_CITIES_SUCCESS = 'GET_CITIES_SUCCESS';
@@ -87,7 +88,7 @@ export const getCities = (isGetMore: boolean = false) => {
       dispatch(getCitiesStart());
 
     try {
-      const result = await fetch(apiUrl);
+      const result = await fetch_retry(apiUrl, {}, API_RETRY_ATTEMPTS);
       const jsonRes = await result.json();
 
       return dispatch(getCitiesSuccess(jsonRes, isGetMore));
@@ -99,9 +100,9 @@ export const getCities = (isGetMore: boolean = false) => {
 
 const getCityDetails = async(id: number) => {
   try {
-    const cityRes = await fetch(`${API_URL}/${id}`);
+    const cityRes = await fetch_retry(`${API_URL}/${id}`, {}, API_RETRY_ATTEMPTS);
 
-    if (cityRes.status !== 200) {
+    if (cityRes.status !== GET_SUCCESS_CODE) {
       throw new Error('Bad response from server');
     }
 
@@ -121,9 +122,9 @@ export const getPreferredCities = () => {
 
     try {
       const preferredCities: City[] = [];
-      const result = await fetch(PREFERRED_API_URL);
+      const result = await fetch_retry(PREFERRED_API_URL, {}, API_RETRY_ATTEMPTS);
 
-      if (result.status !== 200) {
+      if (result.status !== GET_SUCCESS_CODE) {
         throw new Error('Bad response from server');
       }
 
@@ -157,16 +158,16 @@ export const updatePreferredCities = (preferredCities: City[]) => {
       const ids: PreferredCitiesPatch = Object.assign({},
         ...preferredCities.map(({geonameid, selected}) => ({[geonameid]: selected})));
 
-      const res = await fetch(PREFERRED_API_URL, {
+      const res = await fetch_retry(PREFERRED_API_URL, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(ids)
-      });
+      }, API_RETRY_ATTEMPTS);
 
-      if (res.status !== 204) {
+      if (res.status !== PATCH_SUCCESS_CODE) {
         throw new Error('Bad response from server');
       }
 
