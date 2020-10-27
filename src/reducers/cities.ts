@@ -15,7 +15,7 @@ import { createReducer } from '../types/Reducer';
 
 const defaultState: CitiesState = {
   isLoading: false,
-  isScrolling: false,
+  isLoadingSelected: false,
   error: null,
   cities: [],
   preferredCities: [],
@@ -61,18 +61,18 @@ export default createReducer<CitiesState>(defaultState, {
   }),
   [GET_PREFERRED_CITIES_START]: state => ({
     ...state,
-    isLoading: true,
-    error: null
+    isLoadingSelected: true,
+    selectedError: null
   }),
   [GET_PREFERRED_CITIES_SUCCESS]: (state, action) => ({
     ...state,
-    isLoading: false,
+    isLoadingSelected: false,
     preferredCities: [...action.preferredCities.data]
   }),
   [GET_PREFERRED_CITIES_ERROR]: (state, action) => ({
     ...state,
-    isLoading: false,
-    error: action.error
+    isLoadingSelected: false,
+    selectedError: action.error
   }),
   [UPDATE_SEARCH_TEXT]: (state, action) => ({
     ...state,

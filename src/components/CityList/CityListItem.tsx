@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { updatePreferredCities } from '../../actions/cities';
 import City from '../../types/City';
@@ -20,6 +20,10 @@ const CityListItem =  (props: CityProps) => {
     const payload: PreferredCitiesPatch = {[cityId.toString()]: e.currentTarget.checked};
     dispatch(updatePreferredCities(payload));
   }
+
+  useEffect(() => {
+    updateChecked(isChecked);
+  }, [isChecked]);
 
   return (
     <div key={city.geonameid} className="CityListItem">

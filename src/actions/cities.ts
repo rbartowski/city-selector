@@ -1,6 +1,6 @@
 
 import CitiesResponse from "../types/CitiesResponse";
-import { Action, Dispatch } from 'redux';
+import { Action } from 'redux';
 import { RootState } from "../types/RootState";
 import PreferredCitiesPatch from "../types/PreferredCitiesPatch";
 import PreferredCities from "../types/PreferredCities";
@@ -73,7 +73,7 @@ export const updateSearchText = (searchText: string) => ({
 });
 
 export const getFilteredCities = (searchText: string) => {
-  return (dispatch: Dispatch<any>) => {
+  return (dispatch: ThunkDispatch<RootState, void, Action>) => {
     dispatch(updateSearchText(searchText));
     dispatch(getCities(true));
   };
@@ -134,12 +134,5 @@ export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => 
       return dispatch(updatePreferredCitiesError(error));
     }
   };
-};
-
-export const getInitialData = () => {
-  return async (dispatch: ThunkDispatch<RootState, void, Action>) => {
-    await dispatch(getPreferredCities());
-    await dispatch(getCities());
-  }
 };
 

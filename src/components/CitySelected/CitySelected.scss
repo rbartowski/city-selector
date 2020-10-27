@@ -1,0 +1,29 @@
+@import '../../styles/fonts.scss';
+@import '../../styles/colors.scss';
+
+.CitySelected {
+  border-right: 1px solid $cl-silver;
+  border-left: 1px solid $cl-silver;
+  border-bottom: 1px solid $cl-silver;
+  padding: 10px;
+  display: flex;
+  align-items: flex-start;
+
+  &__badge {
+    &:not(:last-of-type) {
+      margin-right: 5px;
+    }
+
+    background-color: $cl-royal-blue;
+    border-radius: 10px;
+    display: inline-flex;
+    padding: 5px;
+    font-size: $size-10;
+    color: $cl-white;
+
+    span {
+      cursor: pointer;
+      margin-left: 5px;
+    }
+  }
+}

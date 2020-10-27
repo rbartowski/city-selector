@@ -1,19 +1,11 @@
 import City from "./City";
+import { Pagination } from "./Pagination";
 
 export interface CitiesState {
   isLoading: boolean,
-  isScrolling: boolean,
+  isLoadingSelected: boolean,
   error: Error | null,
   cities: City[],
   preferredCities: number[],
-  pagination: {
-    total: number,
-    next?: string,
-    prev?: string,
-    last: string,
-    first: string,
-    pageSize: number,
-    currentPage: number,
-    searchText: string,
-  }
+  pagination: Pagination
 }

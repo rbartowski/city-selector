@@ -1,21 +1,22 @@
 import React, { RefObject, SyntheticEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getCities } from '../../actions/cities';
 import CityListItem from './CityListItem';
-import { RootState } from '../../types/RootState';
 import City from '../../types/City';
 import './CityList.scss';
 import useThrottle from '../../hooks/useThrottle';
+import { Pagination } from '../../types/Pagination';
 
 type CityListProps = {
-  cities: City[]
+  cities: City[],
+  preferredCities: number[],
+  isLoading: boolean,
+  pagination: Pagination
 }
 
 const CityList =  (props: CityListProps) => {
+  const {pagination, isLoading, cities, preferredCities} = props;
   const cityList = useRef<HTMLDivElement>(null);
-  const isLoading = useSelector((state:RootState) => state.citiesState.isLoading);
-  const pagination = useSelector((state:RootState) => state.citiesState.pagination);
-  const preferredCities = useSelector((state: RootState) => state.citiesState.preferredCities);
   const [scrollAmount, setScrollAmount] = useState(0);
   const throttledScrollAmount = useThrottle(scrollAmount, 500);
   const dispatch = useDispatch();
@@ -53,7 +54,7 @@ const CityList =  (props: CityListProps) => {
 
   return (
     <div ref={cityList} onScroll={handleScroll} className="CityList">
-      {props.cities.map(city => (
+      {cities.map(city => (
         <CityListItem
           key={city.geonameid}
           city={city}
