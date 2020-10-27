@@ -57,6 +57,7 @@ const CityPicker =  () => {
 
   return (
     <div ref={cityPicker} className="CityPicker">
+      <img className="CityPicker__world" src="/world.png" alt="world_icon" />
       <input
         id="city-picker"
         type="text"
@@ -66,7 +67,7 @@ const CityPicker =  () => {
         value={searchText || ''}
         placeholder="Type to filter by city name or country"
       />
-      <img src="/loading.gif" alt="loading" style={{ opacity: isLoading ? 1 : 0}}/>
+      <img className="CityPicker__loading" src="/loading.gif" alt="loading" style={{ opacity: isLoading ? 1 : 0}}/>
       <div className="CityPicker__bottomPanel">
         {!!(preferredError || updateError || citiesError) &&
           <div className="CityPicker__error">

@@ -15,11 +15,22 @@
   }
 
   img {
+
+    position: absolute;
+
+  }
+
+  &__loading {
     width: 20px;
     height: 20px;
-    position: absolute;
     top: 5px;
     right: 10px;
+  }
+
+  &__world {
+    width: 30px;
+    height: 30px;
+    left: 5px;
   }
 
   &__bottomPanel {
