@@ -27,7 +27,7 @@ const CityPicker =  () => {
   useOnClickOutside(cityPicker, clickOutside);
 
   // Text input key stroke
-  const [searchText, updateSearchText] = useState<string | undefined>(undefined);
+  const [searchText, updateSearchText] = useState<string | null>(null);
   const debouncedText = useDebounce(searchText, 500);
   const dispatch = useDispatch();
 
@@ -36,7 +36,7 @@ const CityPicker =  () => {
   };
 
   useEffect(() => {
-    if (debouncedText !== undefined) {
+    if (debouncedText !== null) {
       dispatch(getFilteredCities(debouncedText));
     }
   }, [debouncedText, dispatch]);
@@ -63,10 +63,10 @@ const CityPicker =  () => {
         onFocus={handleFocus}
         onChange={handleTextChange}
         autoComplete="off"
-        value={searchText}
+        value={searchText || ''}
         placeholder="Type to filter by city name or country"
       />
-      {isLoading && (<img src="/loading.gif" alt="loading"/>)}
+      <img src="/loading.gif" alt="loading" style={{ opacity: isLoading ? 1 : 0}}/>
       <div className="CityPicker__bottomPanel">
         {!!(preferredError || updateError || citiesError) &&
           <div className="CityPicker__error">
@@ -81,7 +81,7 @@ const CityPicker =  () => {
             preferredCities={preferredCities}
             isLoading={isLoading}
             pagination={pagination}
-            searchTerm={searchText}
+            searchTerm={searchText || ''}
           />
         }
       </div>

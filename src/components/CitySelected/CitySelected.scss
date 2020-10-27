@@ -10,6 +10,8 @@
   align-items: flex-start;
   flex-wrap: wrap;
   gap: 5px;
+  max-height: 145px;
+  overflow-y: scroll;
 
   &__badge {
     background-color: $cl-royal-blue;
