@@ -63,7 +63,7 @@ const updatePreferredCitiesSuccess = (preferredCities: PreferredCitiesPatch) => 
 });
 
 const updatePreferredCitiesError = (error: Error) => ({
-  type: UPDATE_PREFERRED_CITIES_SUCCESS,
+  type: UPDATE_PREFERRED_CITIES_ERROR,
   error
 });
 
@@ -120,7 +120,7 @@ export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => 
     dispatch(updatePreferredCitiesStart());
 
     try {
-      await fetch(PREFERRED_API_URL, {
+      const res = await fetch(PREFERRED_API_URL, {
         method: 'PATCH',
         headers: {
           'Accept': 'application/json',
@@ -129,8 +129,12 @@ export const updatePreferredCities = (preferredCities: PreferredCitiesPatch) => 
         body: JSON.stringify(preferredCities)
       });
 
+      if (res.status !== 204) {
+        throw new Error();
+      }
+
       return dispatch(updatePreferredCitiesSuccess(preferredCities));
-    } catch (error) {
+    } catch(error) {
       return dispatch(updatePreferredCitiesError(error));
     }
   };

@@ -104,6 +104,7 @@ export default createReducer<CitiesState>(defaultState, {
   [UPDATE_PREFERRED_CITIES_ERROR]: (state, action) => ({
     ...state,
     isLoading: false,
-    error: action.error
+    error: action.error,
+    preferredCities: [...state.preferredCities]
   })
 });

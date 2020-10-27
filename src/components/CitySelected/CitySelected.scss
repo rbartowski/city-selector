@@ -8,12 +8,10 @@
   padding: 10px;
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 5px;
 
   &__badge {
-    &:not(:last-of-type) {
-      margin-right: 5px;
-    }
-
     background-color: $cl-royal-blue;
     border-radius: 10px;
     display: inline-flex;

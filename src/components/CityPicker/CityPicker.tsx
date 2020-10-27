@@ -67,6 +67,7 @@ const CityPicker =  () => {
             preferredCities={preferredCities}
             isLoading={isLoading}
             pagination={pagination}
+            searchTerm={searchText}
           />
         }
       </div>

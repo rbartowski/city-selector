@@ -11,11 +11,12 @@ type CityListProps = {
   cities: City[],
   preferredCities: number[],
   isLoading: boolean,
-  pagination: Pagination
+  pagination: Pagination,
+  searchTerm: string | undefined
 }
 
 const CityList =  (props: CityListProps) => {
-  const {pagination, isLoading, cities, preferredCities} = props;
+  const {pagination, isLoading, cities, preferredCities, searchTerm} = props;
   const cityList = useRef<HTMLDivElement>(null);
   const [scrollAmount, setScrollAmount] = useState(0);
   const throttledScrollAmount = useThrottle(scrollAmount, 500);
@@ -59,6 +60,7 @@ const CityList =  (props: CityListProps) => {
           key={city.geonameid}
           city={city}
           isChecked={preferredCities.includes(city.geonameid)}
+          searchTerm={searchTerm}
         />
       ))}
     </div>
